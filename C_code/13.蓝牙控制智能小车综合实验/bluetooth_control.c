@@ -1354,90 +1354,80 @@ void serial_data_parse()
   //解析上位机发过来的模式切换指令
 	if(StringFind((const char *)InputString, (const char *)"MODE", 0) > 0)
 	{
-		if(InputString[10] == '0')//停止模式
-		{
+		if(InputString[10] == '0') { //停止模式
 			brake();
 			g_CarState = enSTOP;
 			g_modeSelect = 1;
 			BeepOnOffMode();
-		}
-		else
-		{
-		  switch (InputString[9])
-        	{
-           case '0': g_modeSelect = 1; ModeBEEP(0); break;
-           case '1': g_modeSelect = 1; ModeBEEP(1); break;//遥控模式
-           case '2': g_modeSelect = 2; ModeBEEP(2); break;//巡线模式
-           case '3': g_modeSelect = 3; ModeBEEP(3); break;//避障模式
-           case '4': g_modeSelect = 4; ModeBEEP(4); break;//七彩模式
-           case '5': g_modeSelect = 5; ModeBEEP(5); break;//寻光模式
-           case '6': g_modeSelect = 6; ModeBEEP(6); break;//跟随模式
-           default: g_modeSelect = 1; break;
-      		}
-      		delay(1000);
-      		BeepOnOffMode();
+		} else {
+		  switch (InputString[9]) {
+        case '0': g_modeSelect = 1; ModeBEEP(0); break;
+        case '1': g_modeSelect = 1; ModeBEEP(1); break;//遥控模式
+        case '2': g_modeSelect = 2; ModeBEEP(2); break;//巡线模式
+        case '3': g_modeSelect = 3; ModeBEEP(3); break;//避障模式
+        case '4': g_modeSelect = 4; ModeBEEP(4); break;//七彩模式
+        case '5': g_modeSelect = 5; ModeBEEP(5); break;//寻光模式
+        case '6': g_modeSelect = 6; ModeBEEP(6); break;//跟随模式
+        default: g_modeSelect = 1; break;
+      }
+      delay(1000);
+      BeepOnOffMode();
 		}
 	  memset(InputString, 0x00, sizeof(InputString));
-      NewLineReceived = 0;
-      return;	  
+    NewLineReceived = 0;
+    return;	  
 	}
-	
+
 	//非apk模式则退出
-//	if(g_modeSelect != 1)
-//	{
-//	    memset(InputString, 0x00, sizeof(InputString));
-//		NewLineReceived = 0;
-//		return;
-//	}
-	
+  //	if(g_modeSelect != 1)
+  //	{
+  //	    memset(InputString, 0x00, sizeof(InputString));
+  //		NewLineReceived = 0;
+  //		return;
+  //	}
+
   //解析上位机发来的舵机云台的控制指令并执行舵机旋转
   //如:$4WD,PTZ180# 舵机转动到180度
-  	if (StringFind((const char *)InputString, (const char *)"PTZ", 0) > 0)
-	{
+  if (StringFind((const char *)InputString, (const char *)"PTZ", 0) > 0) {
 		int m_kp, i, ii;
-        //寻找以PTZ开头,#结束中间的字符
+    //寻找以PTZ开头,#结束中间的字符
 		i = StringFind((const char *)InputString, (const char *)"PTZ", 0); 
 		ii = StringFind((const char *)InputString, (const char *)"#", i);
-		if (ii > i)
-		{
+		if (ii > i) {
 			char m_skp[5] = {0};
 			memcpy(m_skp, InputString + i + 3, ii - i -3);
-			
+
 			m_kp = atoi(m_skp);        //将找到的字符串变成整型
 
 			servo_appointed_detection(180 - m_kp);//转动到指定角度m_kp
-			NewLineReceived = 0;  
+			NewLineReceived = 0;
 			memset(InputString, 0x00, sizeof(InputString));
 			return;
 		}
-  	}
+  }
 
   //解析上位机发来的七彩探照灯指令并点亮相应的颜色
   //如:$4WD,CLR255,CLG0,CLB0# 七彩灯亮红色
-  	 if (StringFind((const char *)InputString, (const char *)"CLR", 0) > 0)
- 	{
+  if (StringFind((const char *)InputString, (const char *)"CLR", 0) > 0) {
 		int m_kp, i, ii, red, green, blue;
 		char m_skp[5] = {0};
 		i = StringFind((const char *)InputString, (const char *)"CLR", 0);
 		ii = StringFind((const char *)InputString, (const char *)",", i);
-		if (ii > i)
-		{			
+		if (ii > i) {			
 			memcpy(m_skp, InputString + i + 3, ii - i -3);
 			m_kp = atoi(m_skp);
 			red =   m_kp;
 		}
 		i = StringFind((const char *)InputString, (const char *)"CLG", 0);
 		ii = StringFind((const char *)InputString, (const char *)",", i);
-		if (ii > i)
-		{
+		if (ii > i) {
 			memcpy(m_skp, InputString + i + 3, ii - i -3);
 			m_kp = atoi(m_skp);
 			green =   m_kp;
 		}
 		i = StringFind((const char *)InputString, (const char *)"CLB", 0);
 		ii = StringFind((const char *)InputString, (const char *)"#", i);
-		if (ii > i)
-		{
+		if (ii > i) {
 			memcpy(m_skp, InputString + i + 3, ii - i -3);
 			m_kp = atoi(m_skp);
 			blue =  m_kp;
@@ -1451,44 +1441,32 @@ void serial_data_parse()
   //解析上位机发来的通用协议指令,并执行相应的动作
   //如:$1,0,0,0,0,0,0,0,0,0#    小车前进
   if (StringFind((const char *)InputString, (const char *)"4WD", 0) == -1 &&
-		                    StringFind((const char *)InputString,(const char *)"#",0) > 0)
-  {
+		  StringFind((const char *)InputString,(const char *)"#",0) > 0) {
     //puts(InputString);
     //小车原地左旋右旋判断
-    if (InputString[3] == '1')      //小车原地左旋
-    {
+    if (InputString[3] == '1') {      //小车原地左旋
       g_CarState = enTLEFT;
-    }
-    else if (InputString[3] == '2') //小车原地右旋
-    {
+    } else if (InputString[3] == '2') { //小车原地右旋
       g_CarState = enTRIGHT;
-    }
-    else
-    {
+    } else {
       g_CarState = enSTOP;
     }
 
     //小车鸣笛判断
-    if (InputString[5] == '1')     //鸣笛
-    {
+    if (InputString[5] == '1') {    //鸣笛
       whistle();
     }
 
     //小车加减速判断
-    if (InputString[7] == '1')     //加速，每次加50
-    {
+    if (InputString[7] == '1') {    //加速，每次加50
       g_CarSpeedControl += 20;
-      if (g_CarSpeedControl > 200)
-      {
+      if (g_CarSpeedControl > 200) {
         g_CarSpeedControl = 200;
       }
-
     }
-    if (InputString[7] == '2')    //减速，每次减50
-    {
+    if (InputString[7] == '2') {   //减速，每次减50
       g_CarSpeedControl -= 20;
-      if (g_CarSpeedControl < 100)
-      {
+      if (g_CarSpeedControl < 100) {
         g_CarSpeedControl = 100;
       }
     }
@@ -1504,41 +1482,39 @@ void serial_data_parse()
     }
 */
     //点灯判断
-    if (InputString[13] == '1')//七彩灯亮白色
-    {
+    if (InputString[13] == '1') { //七彩灯亮白色
       g_lednum++;
-      if(g_lednum == 1){
-			color_led_pwm(255, 255, 255);
-		}
-		else if(g_lednum == 2)
-		{
-			color_led_pwm(255,0,0);
-		}
-		else if(g_lednum == 3)
-    {
-			color_led_pwm(0,255,0);
-		}
-		else if(g_lednum == 4)
-		{
-			color_led_pwm(0,0,255);
-		}
-		else if(g_lednum == 5)
-		{
-			color_led_pwm(255,255,0);
-		}
-		else if(g_lednum == 6)
-		{
-			color_led_pwm(0,255,255);
-		}
-		else if(g_lednum == 7)
-		{
-			color_led_pwm(255,0,255);
-		}
-		else
-		{
-		   color_led_pwm(0,0,0);
-		   g_lednum=0;
-		}
+      if(g_lednum == 1) {
+        color_led_pwm(255, 255, 255);
+      } else if(g_lednum == 2)
+        {
+          color_led_pwm(255,0,0);
+        }
+        else if(g_lednum == 3)
+        {
+          color_led_pwm(0,255,0);
+        }
+        else if(g_lednum == 4)
+        {
+          color_led_pwm(0,0,255);
+        }
+        else if(g_lednum == 5)
+        {
+          color_led_pwm(255,255,0);
+        }
+        else if(g_lednum == 6)
+        {
+          color_led_pwm(0,255,255);
+        }
+        else if(g_lednum == 7)
+        {
+          color_led_pwm(255,0,255);
+        }
+        else
+        {
+          color_led_pwm(0,0,0);
+          g_lednum=0;
+        }
     }
     if (InputString[13] == '2')//七彩灯亮红色
     {
@@ -1852,54 +1828,48 @@ int main()
   servo_init();
 	
   //打开串口设备，如若失败则会打印错误信息
-  if ((fd = serialOpen("/dev/ttyAMA0", 9600)) < 0)
-  {
+  if ((fd = serialOpen("/dev/ttyAMA0", 9600)) < 0) {
     fprintf(stderr, "Uable to open serial device: %s\n", strerror(errno));
-	return -1;
+	  return -1;
   }
-  while(1)
-  {
-   //调用串口解包函数
-   serialEvent();
-   if (NewLineReceived)
-   {	
-    printf("serialdata:%s\n",InputString);
-    serial_data_parse();  //调用串口解析函数
-	NewLineReceived = 0;
-   }
+  while(1) {
+    //调用串口解包函数
+    serialEvent();
+    if (NewLineReceived) {	
+      printf("serialdata:%s\n",InputString);
+      serial_data_parse();  //调用串口解析函数
+      NewLineReceived = 0;
+    }
    
-   //切换不同功能模式
-   switch (g_modeSelect)
-   {
-    case 1: break; //暂时保留
-    case 2: Tracking_Mode(); break; //巡线模式
-    case 3: Ultrasonic_avoidMode();  break;  //超声波避障模式
-    case 4: LED_Color_Mode(); break;  //七彩颜色模式
-    case 5: LightSeeking_Mode(); break;  //寻光模式
-    case 6: Infrared_follow_Mode(); break;  //红外跟随模式
-   }
-   //舵机云台的控制
-   Servo_Control_Thread();
-   //让串口平均每秒发送采集的数据给上位机   
-   if(g_modeSelect == 1)
-   {
-   	serialtime--;
-   	if(serialtime ==0)
-   	{
-	 count--;
-	 serialtime = 5000;
-	 if(count == 0)
-	 {
-     	 serial_data_postback(fd);
-		 serialtime = 5000;
-		 count = 20;
-	 }
-   	}
-   }
-   usleep(10);
+    //切换不同功能模式
+    switch (g_modeSelect)
+    {
+      case 1: break; //暂时保留
+      case 2: Tracking_Mode(); break; //巡线模式
+      case 3: Ultrasonic_avoidMode();  break;  //超声波避障模式
+      case 4: LED_Color_Mode(); break;  //七彩颜色模式
+      case 5: LightSeeking_Mode(); break;  //寻光模式
+      case 6: Infrared_follow_Mode(); break;  //红外跟随模式
+    }
+    //舵机云台的控制
+    Servo_Control_Thread();
+    //让串口平均每秒发送采集的数据给上位机   
+    if(g_modeSelect == 1) {
+      serialtime--;
+      if(serialtime ==0) {
+        count--;
+        serialtime = 5000;
+        if(count == 0) {
+          serial_data_postback(fd);
+          serialtime = 5000;
+          count = 20;
+        }
+      }
+    }
+    usleep(10);
   }
- serialClose(fd);  //关闭串口
- return 0;
+  serialClose(fd);  //关闭串口
+  return 0;
 }
 
 
