@@ -9,6 +9,7 @@
 * @par History  见如下说明
 */
 #include <wiringPi.h>
+#include <stdio.h>
 
 #define ON 1     //使能LED
 #define OFF 0    //禁止LED
@@ -29,16 +30,27 @@ int LED_B = 5;  //LED_B接在Raspberry上的wiringPi编码5口
 * @retval        void
 * @par History   无
 */
-void color_led(int v_iRed, int v_iGreen, int v_iBlue)
+int color_led(int v_iRed, int v_iGreen, int v_iBlue)
 {
-  //红色LED
-  v_iRed == ON ? digitalWrite(LED_R, HIGH): digitalWrite(LED_R, LOW);
- 
-  //绿色LED
-  v_iGreen == ON ? digitalWrite(LED_G, HIGH) : digitalWrite(LED_G, LOW);
+  while(1) {
+    //红色LED
+    v_iRed == ON ? digitalWrite(LED_R, HIGH): digitalWrite(LED_R, LOW);
   
-  //蓝色LED
-  v_iBlue == ON ? digitalWrite(LED_B, HIGH) : digitalWrite(LED_B, LOW);
+    //绿色LED
+    v_iGreen == ON ? digitalWrite(LED_G, HIGH) : digitalWrite(LED_G, LOW);
+    
+    //蓝色LED
+    v_iBlue == ON ? digitalWrite(LED_B, HIGH) : digitalWrite(LED_B, LOW);
+    delay(100);
+    printf("start: R: %d, G: %d, B: %d\n",digitalRead(LED_R), digitalRead(LED_G), digitalRead(LED_B));
+    printf("input: R: %d, G: %d, B: %d\n",v_iRed, v_iGreen, v_iBlue);
+
+    if (v_iRed == digitalRead(LED_R) && v_iGreen == digitalRead(LED_G) && v_iBlue == digitalRead(LED_B)) {
+    printf("stop: R: %d, G: %d, B: %d\n",digitalRead(LED_R), digitalRead(LED_G), digitalRead(LED_B));
+      return 0;
+    }
+    printf("start: R: %d, G: %d, B: %d\n",digitalRead(LED_R), digitalRead(LED_G), digitalRead(LED_B));
+  }
 }
 
 /**
@@ -58,7 +70,9 @@ int main()
 	pinMode(LED_R, OUTPUT);
 	pinMode(LED_G, OUTPUT);
 	pinMode(LED_B, OUTPUT);
-	
+	printf("start a: %d \n", a);
+  printf("R: %d, G: %d, B: %d\n",digitalRead(LED_R), digitalRead(LED_G), digitalRead(LED_B));
+
 	while (1)
 	{                        //   LED_R   LED_G    LED_B
     color_led(ON, OFF, OFF); //   1        0        0

@@ -38,13 +38,13 @@ void run(int time)
   digitalWrite(Left_motor_go, HIGH);    //左电机前进使能
   digitalWrite(Left_motor_back, LOW);   //左电机后退禁止
   //更新指定管脚的PWM值
-  softPwmWrite(Left_motor_pwm, 255);    //pwm控速0-255之，左右轮略有差异
+  softPwmWrite(Left_motor_pwm, 50);    //pwm控速0-255之，左右轮略有差异
 
   //右电机前进
   digitalWrite(Right_motor_go, HIGH);   //右电机前进使能
   digitalWrite(Right_motor_back, LOW);  //右电机后退禁止
   //更新指定管脚的PWM值
-  softPwmWrite(Right_motor_pwm, 255);   //pwm控速0-255之，左右轮略有差异
+  softPwmWrite(Right_motor_pwm, 50);   //pwm控速0-255之，左右轮略有差异
 
   //延时
   delay(time * 100); //delay函数默认是以ms作为单位的

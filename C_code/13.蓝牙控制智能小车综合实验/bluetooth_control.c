@@ -1443,15 +1443,6 @@ void serial_data_parse()
   if (StringFind((const char *)InputString, (const char *)"4WD", 0) == -1 &&
 		  StringFind((const char *)InputString,(const char *)"#",0) > 0) {
     //puts(InputString);
-    //小车原地左旋右旋判断
-    if (InputString[3] == '1') {      //小车原地左旋
-      g_CarState = enTLEFT;
-    } else if (InputString[3] == '2') { //小车原地右旋
-      g_CarState = enTRIGHT;
-    } else {
-      g_CarState = enSTOP;
-    }
-
     //小车鸣笛判断
     if (InputString[5] == '1') {    //鸣笛
       whistle();
@@ -1482,93 +1473,83 @@ void serial_data_parse()
     }
 */
     //点灯判断
-    if (InputString[13] == '1') { //七彩灯亮白色
-      g_lednum++;
-      if(g_lednum == 1) {
-        color_led_pwm(255, 255, 255);
-      } else if(g_lednum == 2)
-        {
+    if (InputString[13] != '0') { //黄色
+      if (InputString[13] == '1') { //七彩灯亮白色
+        g_lednum++;
+        if(g_lednum == 1) {
+          color_led_pwm(255, 255, 255);
+        } else if(g_lednum == 2) {
           color_led_pwm(255,0,0);
-        }
-        else if(g_lednum == 3)
-        {
+        } else if(g_lednum == 3) {
           color_led_pwm(0,255,0);
-        }
-        else if(g_lednum == 4)
-        {
+        } else if(g_lednum == 4) {
           color_led_pwm(0,0,255);
-        }
-        else if(g_lednum == 5)
-        {
+        } else if(g_lednum == 5) {
           color_led_pwm(255,255,0);
-        }
-        else if(g_lednum == 6)
-        {
+        } else if(g_lednum == 6) {
           color_led_pwm(0,255,255);
-        }
-        else if(g_lednum == 7)
-        {
+        } else if(g_lednum == 7) {
           color_led_pwm(255,0,255);
-        }
-        else
-        {
+        } else {
           color_led_pwm(0,0,0);
           g_lednum=0;
         }
-    }
-    if (InputString[13] == '2')//七彩灯亮红色
-    {
-      color_led_pwm(255, 0, 0);
-    }
-    if (InputString[13] == '3')//七彩灯亮绿灯
-    {
-      color_led_pwm(0, 255, 0);
-    }
-    if (InputString[13] == '4') //七彩灯亮蓝灯
-    {
-      color_led_pwm(0, 0, 255);
-    }
-		if (InputString[13] == '5')//青色
-		{
-		  color_led_pwm(0, 255, 255);
-		}
-	  if (InputString[13] == '6')//品红色
-		{
-		  color_led_pwm(255, 0, 255);
-		}
-	  if (InputString[13] == '7')//黄色
-		{
-		  color_led_pwm(255, 255, 0);
-		}
-		if (InputString[13] == '8') //七彩灯灭掉
-    {
-      color_led_pwm(0, 0, 0);
+      }
+
+      if (InputString[13] == '2') { //七彩灯亮红色
+        color_led_pwm(255, 0, 0);
+      }
+      if (InputString[13] == '3') { //七彩灯亮绿灯
+        color_led_pwm(0, 255, 0);
+      }
+      if (InputString[13] == '4') { //七彩灯亮蓝灯
+        color_led_pwm(0, 0, 255);
+      }
+      if (InputString[13] == '5') { //青色
+        color_led_pwm(0, 255, 255);
+      }
+      if (InputString[13] == '6') { //品红色
+        color_led_pwm(255, 0, 255);
+      }
+      if (InputString[13] == '7') { //黄色
+        color_led_pwm(255, 255, 0);
+      }
+      if (InputString[13] == '8') { //七彩灯灭掉
+        color_led_pwm(0, 0, 0);
+      }
     }
 
     //灭火判断
-    if (InputString[15] == '1')  //灭火
-    {
+    if (InputString[15] == '1') {  //灭火
       digitalWrite(OutfirePin, !digitalRead(OutfirePin));
     }
 
-    //舵机归为判断
-    if (InputString[17] == '1') //舵机旋转到90度
-    {
+    //舵机归位判断
+    if (InputString[17] == '1') { //舵机旋转到90度
       g_frontservopos = 90; 
     }
-	//前后舵机前后左右转动
-	switch(InputString[9])
-	{
-		case front_left_servo: g_frontservopos = 180 ;break;
-		case front_right_servo: g_frontservopos = 0;break;
-		case up_servo:  g_ServoState = enSERVOUP; break;
-		case down_servo: g_ServoState = enSERVODOWN;break;
-		case left_servo: g_ServoState = enSERVOLEFT;break;
-		case right_servo: g_ServoState = enSERVORIGHT;break;
-		case updowninit_servo: g_ServoState = enSERVOUPDOWNINIT;break;
-		case stop_servo: g_ServoState = enSERVOSTOP;break;
-	}
+    
+    //前后舵机前后左右转动
+    switch(InputString[9])
+    {
+      case front_left_servo: g_frontservopos = 180 ;break;
+      case front_right_servo: g_frontservopos = 0;break;
+      case up_servo:  g_ServoState = enSERVOUP; break;
+      case down_servo: g_ServoState = enSERVODOWN;break;
+      case left_servo: g_ServoState = enSERVOLEFT;break;
+      case right_servo: g_ServoState = enSERVORIGHT;break;
+      case updowninit_servo: g_ServoState = enSERVOUPDOWNINIT;break;
+      case stop_servo: g_ServoState = enSERVOSTOP;break;
+    }
 
+    //小车原地左旋右旋判断
+    if (InputString[3] == '1') {      //小车原地左旋
+      g_CarState = enTLEFT;
+    } else if (InputString[3] == '2') { //小车原地右旋
+      g_CarState = enTRIGHT;
+    } else {
+      g_CarState = enSTOP;
+    }
     //小车的前进,后退,左转,右转,停止动作
     if (g_CarState != enTLEFT && g_CarState != enTRIGHT)
     {
@@ -1583,9 +1564,6 @@ void serial_data_parse()
       }
     }
 
-    memset(InputString, 0x00, sizeof(InputString));       //清空串口数据
-    NewLineReceived = 0;
-
     //根据小车状态做相应的动作
     switch (g_CarState)
     {
@@ -1598,6 +1576,10 @@ void serial_data_parse()
       case enTRIGHT: spin_right(g_CarSpeedControl, g_CarSpeedControl); break;
       default: brake(); break;
     }
+
+    memset(InputString, 0x00, sizeof(InputString));       //清空串口数据
+    NewLineReceived = 0;
+
   }
 }
 
@@ -1837,6 +1819,7 @@ int main()
     serialEvent();
     if (NewLineReceived) {	
       printf("serialdata:%s\n",InputString);
+      // 解析模式，和执行主模式的操作
       serial_data_parse();  //调用串口解析函数
       NewLineReceived = 0;
     }
